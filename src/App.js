@@ -1,24 +1,56 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import "./App.css";
+import Navbar from "./components/Navbar";
+import Characters from "./components/Characters";
+import Pagination from "./components/Pagination";
 
 function App() {
+  const initialUrl = "https://rickandmortyapi.com/api/character";
+  const [characters, setCharacters] = useState([]);
+  const [info, setInfo] = useState({});
+
+  const fetchCharacters = (url) => {
+    fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        setCharacters(data.results);
+        setInfo(data.info);
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const onPrev = () => {
+    fetchCharacters(info.prev);
+  };
+
+  const onNext = () => {
+    fetchCharacters(info.next);
+  };
+
+  useEffect(() => {
+    // useEffect con dependencia vacia ([]): ejecuta fetchCharacters solo cuando se renderiza el componente
+    fetchCharacters(initialUrl);
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <nav className="App">
+      <Navbar brand="Rick and Morty" />
+      <div className="container mt-3">
+        <Pagination
+          prev={info.prev}
+          next={info.next}
+          onPrev={onPrev}
+          onNext={onNext}
+        />
+        <Characters characters={characters} />
+        <Pagination
+          prev={info.prev}
+          next={info.next}
+          onPrev={onPrev}
+          onNext={onNext}
+        />
+      </div>
+    </nav>
   );
 }
 
